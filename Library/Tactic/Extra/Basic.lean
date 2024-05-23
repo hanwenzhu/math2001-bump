@@ -17,8 +17,7 @@ LHS, `68 * n ^ 2`, is nonnegative (i.e. neutral for the relation `≥`). -/
 macro (name := extra) "extra" : tactic =>
   `(tactic
     | first
-    | aesop (rule_sets [extra, -builtin, -default]) (simp_options := { enabled := false })
-        (options := { terminal := true })
+    | aesop (rule_sets := [extra, -builtin, -default]) (config := { enableSimp := false, terminal := true })
     | fail "out of scope: extra proves relations between a LHS and a RHS differing by some neutral quantity for the relation")
 
 lemma IneqExtra.neg_le_sub_self_of_nonneg [LinearOrderedAddCommGroup G] {a b : G} (h : 0 ≤ a) :
@@ -26,7 +25,7 @@ lemma IneqExtra.neg_le_sub_self_of_nonneg [LinearOrderedAddCommGroup G] {a b : G
   rw [sub_eq_add_neg]
   apply le_add_of_nonneg_left h
 
-attribute [aesop safe (rule_sets [extra]) (apply (transparency := instances))]
+attribute [aesop safe apply (transparency := instances) (rule_sets := [extra])]
   le_add_of_nonneg_right le_add_of_nonneg_left
   lt_add_of_pos_right lt_add_of_pos_left
   IneqExtra.neg_le_sub_self_of_nonneg
@@ -34,7 +33,9 @@ attribute [aesop safe (rule_sets [extra]) (apply (transparency := instances))]
   sub_le_sub_left sub_le_sub_right sub_lt_sub_left sub_lt_sub_right
   le_refl
 
+example : (1 : ℕ) ≤ 1 := by extra
+
 def extra.Positivity : Lean.Elab.Tactic.TacticM Unit :=
 Lean.Elab.Tactic.liftMetaTactic fun g => do Mathlib.Meta.Positivity.positivity g; pure []
 
-attribute [aesop safe (rule_sets [extra]) tactic] extra.Positivity
+attribute [aesop safe tactic (rule_sets := [extra])] extra.Positivity

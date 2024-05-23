@@ -3,7 +3,7 @@ Copyright (c) 2023 Heather Macbeth. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Heather Macbeth
 -/
-import Mathlib.Tactic.SolveByElim
+import Lean.Meta.Tactic.SolveByElim
 import Mathlib.Tactic.Linarith
 
 /-! # Specialized induction tactics
@@ -25,17 +25,17 @@ def Nat.twoStepInduction' {P : ℕ → Sort u} (base_case_0 : P 0) (base_case_1 
   Nat.twoStepInduction base_case_0 base_case_1 inductive_step a
 
 @[elab_as_elim]
-def Nat.twoStepLeInduction {s : ℕ} {P : ∀ (n : ℕ), s ≤ n → Sort u} 
+def Nat.twoStepLeInduction {s : ℕ} {P : ∀ (n : ℕ), s ≤ n → Sort u}
     (base_case_0 : P s (le_refl s)) (base_case_1 : P (s + 1) (Nat.le_succ s))
     (inductive_step : ∀ (k : ℕ) (hk : s ≤ k), (IH0 : P k hk) → (IH1 : P (k + 1) (le_step hk))
         → P (k + 1 + 1) (le_step (le_step hk)))
       (a : ℕ) (ha : s ≤ a) :
     P a ha := by
-  have key : ∀ m : ℕ, P (s + m) (Nat.le_add_right _ _)
-  · intro m
+  have key : ∀ m : ℕ, P (s + m) (Nat.le_add_right _ _) := by
+    intro m
     induction' m using Nat.twoStepInduction' with k IH1 IH2
     · exact base_case_0
-    · exact base_case_1 
+    · exact base_case_1
     · exact inductive_step _ _ IH1 IH2
   convert key (a - s)
   rw [add_comm, ← Nat.eq_add_of_sub_eq ha]
@@ -48,24 +48,21 @@ syntax (name := BasicInductionSyntax) "simple_induction " (casesTarget,+) (" wit
 
 macro_rules
 | `(tactic| simple_induction $tgts,* $[with $withArg*]?) =>
-    `(tactic| induction' $tgts,* using Nat.induction $[with $withArg*]? <;>
-      push_cast (config := { decide := false }))
+    `(tactic| induction' $tgts,* using Nat.induction $[with $withArg*]?)
 
 open private getElimNameInfo generalizeTargets generalizeVars in evalInduction in
 syntax (name := StartingPointInductionSyntax) "induction_from_starting_point " (casesTarget,+) (" with " (colGt binderIdent)+)? : tactic
 
 macro_rules
 | `(tactic| induction_from_starting_point $tgts,* $[with $withArg*]?) =>
-    `(tactic| induction' $tgts,* using Nat.le_induction $[with $withArg*]? <;>
-      push_cast (config := { decide := false }))
+    `(tactic| induction' $tgts,* using Nat.le_induction $[with $withArg*]?)
 
 open private getElimNameInfo generalizeTargets generalizeVars in evalInduction in
 syntax (name := TwoStepInductionSyntax) "two_step_induction " (casesTarget,+) (" with " (colGt binderIdent)+)? : tactic
 
 macro_rules
 | `(tactic| two_step_induction $tgts,* $[with $withArg*]?) =>
-    `(tactic| induction' $tgts,* using Nat.twoStepInduction' $[with $withArg*]? <;>
-      push_cast (config := { decide := false }) at *)
+    `(tactic| induction' $tgts,* using Nat.twoStepInduction' $[with $withArg*]?)
 
 open private getElimNameInfo generalizeTargets generalizeVars in evalInduction in
 syntax (name := TwoStepStartingPointInductionSyntax) "two_step_induction_from_starting_point " (casesTarget,+) (" with " (colGt binderIdent)+)? : tactic
@@ -105,7 +102,7 @@ theorem lem1 (a : ℤ) {b : ℤ} (hb : 0 < b) : abs a < abs b ↔ -b < a ∧ a <
     left
     constructor <;> linarith
 
-theorem lem2 (a : ℤ) {b : ℤ} (hb : b < 0) : abs a < abs b ↔ b < a ∧ a < -b := by 
+theorem lem2 (a : ℤ) {b : ℤ} (hb : b < 0) : abs a < abs b ↔ b < a ∧ a < -b := by
   rw [abs_lt_abs_iff]
   constructor
   · intro h
@@ -125,8 +122,8 @@ syntax "apply_decreasing_rules" : tactic
 
 elab_rules : tactic |
     `(tactic| apply_decreasing_rules)  => do
-  let cfg : SolveByElim.Config := { backtracking := false }
-  liftMetaTactic fun g => solveByElim.processSyntax cfg false false [] [] #[mkIdent `decreasing] [g]
+  let cfg : SolveByElim.SolveByElimConfig := { backtracking := false }
+  liftMetaTactic fun g => SolveByElim.processSyntax cfg false false [] [] #[mkIdent `decreasing] [g]
 
 macro_rules
 | `(tactic| decreasing_tactic) =>
@@ -143,5 +140,5 @@ macro_rules
       (try simp only [Int.sizeOf_lt_sizeOf_iff, ←sq_lt_sq,  Nat.succ_eq_add_one]);
       nlinarith)
 
-theorem Int.fmod_nonneg_of_pos (a : ℤ) (hb : 0 < b) : 0 ≤ Int.fmod a b := 
+theorem Int.fmod_nonneg_of_pos (a : ℤ) (hb : 0 < b) : 0 ≤ Int.fmod a b :=
   Int.fmod_eq_emod _ hb.le ▸ emod_nonneg _ hb.ne'

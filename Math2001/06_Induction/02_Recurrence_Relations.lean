@@ -70,6 +70,7 @@ example (n : ℕ) : A n = n * (n + 1) / 2 := by
     calc A 0 = 0 := by rw [A]
       _ = 0 * (0 + 1) / 2 := by numbers
   · -- inductive step
+    push_cast
     calc
       A (k + 1) = A k + (k + 1) := by rw [A]
       _ = k * (k + 1) / 2 + (k + 1) := by rw [IH]

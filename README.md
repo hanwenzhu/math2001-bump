@@ -1,3 +1,7 @@
+This is a port of Math2001 to Lean version 4.7.0, intended for experiments and not for actual use.
+
+---
+
 # The Mechanics of Proof
 
 This repository contains the Lean code for the book [The Mechanics of Proof](https://hrmacbeth.github.io/math2001), by [Heather Macbeth](https://faculty.fordham.edu/hmacbeth1), developed for the course Math 2001 at Fordham University.

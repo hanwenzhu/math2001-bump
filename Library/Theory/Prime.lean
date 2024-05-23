@@ -19,7 +19,7 @@ theorem prime_test {p : ℕ} (hp : 2 ≤ p) (H : ∀ m : ℕ, 1 < m → m < p �
   have : ¬m ∣ p := H m hm_left hm_right
   contradiction
 
-lemma better_prime_test {p : ℕ} (hp : 2 ≤ p)  (T : ℕ) (hTp : p < T ^ 2) 
+lemma better_prime_test {p : ℕ} (hp : 2 ≤ p)  (T : ℕ) (hTp : p < T ^ 2)
     (H : ∀ (m : ℕ), 1 < m → m < T → ¬ (m ∣ p)) :
     Prime p := by
   apply prime_test hp
@@ -62,7 +62,7 @@ theorem exists_factor_of_not_prime {p : ℕ} (hp : ¬ Prime p) (hp2 : 2 ≤ p) :
   exact H
 
 theorem exists_prime_factor {n : ℕ} (hn2 : 2 ≤ n) : ∃ p : ℕ, Prime p ∧ p ∣ n := by
-  by_cases hn : Prime n 
+  by_cases hn : Prime n
   . refine ⟨n, hn, 1, ?_⟩
     ring
   . obtain ⟨m, hmn, _, ⟨x, hx⟩⟩ := exists_factor_of_not_prime hn hn2

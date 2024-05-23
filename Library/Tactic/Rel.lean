@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Heather Macbeth
 -/
 import Library.Tactic.Rel.Attr
-import Mathlib.Tactic.SolveByElim
+import Lean.Meta.Tactic.SolveByElim
 import Mathlib.Tactic.GCongr.Core
 
 /-! # Extension to the `rel` tactic for the relation `↔`
@@ -21,15 +21,15 @@ only where needed.
 -/
 
 
-open Lean Elab Tactic
+open Lean Elab Tactic Meta
 open Mathlib Tactic
 
 syntax (name := IffRelSyntax) "iff_rel" " [" term,* "] " : tactic
 
 elab_rules : tactic | `(tactic| iff_rel [$t,*]) => do
   liftMetaTactic <| fun g =>
-    let cfg : SolveByElim.Config := { backtracking := false, maxDepth := 50 }
-    SolveByElim.solveByElim.processSyntax
+    let cfg : SolveByElim.SolveByElimConfig := { backtracking := false, maxDepth := 50 }
+    SolveByElim.processSyntax
       cfg true false t.getElems.toList [] #[mkIdent `iff_rules] [g]
 
 -- not sure where to hang error message

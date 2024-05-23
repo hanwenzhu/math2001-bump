@@ -77,12 +77,12 @@ def List.uniqueAux {α} [DecidableEq α] : List α → List α → List α
 
 def List.unique {α} [DecidableEq α] (xs : List α) := uniqueAux xs []
 
-def prefixVars : List BExpr → List BExpr × List BExpr 
-| [] => ([], []) 
-| e@(.var _) :: tt => 
+def prefixVars : List BExpr → List BExpr × List BExpr
+| [] => ([], [])
+| e@(.var _) :: tt =>
     let (restV, restC) := prefixVars tt
     (e::restV, restC)
-| e :: tt => 
+| e :: tt =>
     let (restV, restC) := prefixVars tt
     (restV, e::restC)
 
@@ -147,7 +147,7 @@ partial def bExprOfPropTerm :
 -- | `(¬ ($P)) => do `(.not ($(← bExprOfPropTerm P)))
 | p =>
   let vnm := p.raw.getId.toString
-  
+
   match p.raw.isIdent with
   | false => throwError ("Illegal Expression " ++ (toString p.raw))
   | true => `(.var $(Syntax.mkStrLit vnm))
@@ -168,13 +168,13 @@ partial def bExprOfPropTerm :
 -- | _ => sorry
 
 @[command_elab «truthTableCommand»] private unsafe def elabTableWidget :
-  Elab.Command.CommandElab := 
+  Elab.Command.CommandElab :=
   open Lean Lean.Elab Command Term in λ
   | stx@`(#truth_table $prop) => do
     let ident ← mkFreshIdent stx
     let decl := Lean.Syntax.getId ident
     let ident := mkIdent decl
-    
+
     -- let tbStx : Lean.TSyntax `term ← Lean.Elab.Command.runTermElabM (λ _ =>
     --   do bExprOfPropTerm (← Lean.Elab.Term.elabType prop))
 
@@ -188,6 +188,5 @@ partial def bExprOfPropTerm :
     let null_stx ← `(Json.null)
     let props : Json ← runTermElabM fun _ =>
       Term.evalTerm Json (mkConst ``Json) null_stx
-    saveWidgetInfo decl props stx
+    liftCoreM $ saveWidgetInfo decl props stx
   | _ => throwUnsupportedSyntax
-
