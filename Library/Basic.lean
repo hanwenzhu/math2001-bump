@@ -21,6 +21,8 @@ import Library.Tactic.TruthTable
 
 notation3 (prettyPrint := false) "forall_sufficiently_large "(...)", "r:(scoped P => ∃ C, ∀ x ≥ C, P x) => r
 
+/- NOTE: Tactics originally disabled by Math2001
+
 macro "linarith" linarithArgsRest : tactic => `(tactic | fail "linarith tactic disabled")
 macro "nlinarith" linarithArgsRest : tactic => `(tactic | fail "nlinarith tactic disabled")
 macro "linarith!" linarithArgsRest : tactic => `(tactic | fail "linarith! tactic disabled")
@@ -59,4 +61,15 @@ elab "math2001_init" : command => do
     ⟨`ext, #[`Prod.ext]⟩,
     ⟨`instance, #[`Int.instDivInt_1,`Int.instDivInt, `Nat.instDivNat]⟩,
     ⟨`norm_num, #[`Mathlib.Meta.NormNum.evalNatDvd, `Mathlib.Meta.NormNum.evalIntDvd]⟩
+  ]
+-/
+
+elab "math2001_init" : command => do
+  trySetOptions #[
+    ⟨`push_neg.use_distrib, true⟩
+  ]
+  tryEraseAttrs #[
+    ⟨`simp, #[`ne_eq]⟩,
+    ⟨`ext, #[`Prod.ext]⟩,
+    ⟨`instance, #[`Int.instDivInt_1,`Int.instDivInt, `Nat.instDivNat]⟩
   ]
